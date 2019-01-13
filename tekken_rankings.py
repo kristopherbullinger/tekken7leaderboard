@@ -75,6 +75,7 @@ def check_process():
 # images are loaded from directory 'char' relative to execution
 # these images must be the EXACT same size as what you capture
 # to generate the images, use code below main(), they aren't included
+playersJSON = []
 char_images = []
 char_names = []
 def load_char_images():
@@ -131,10 +132,11 @@ def process_screen():
     player = 0
 
     # open the file in utf-8 mode because the OCR produces weird results
-    f = io.open('tekken_rank_data_csv.txt', 'w', encoding="utf-8")#, encoding="utf-8"
+    f1 = io.open('tekken_rank_data_csv.txt', 'w', encoding="utf-8")#, encoding="utf-8"
+    f2 = io.open('tekken_rank_data_json.txt', 'w', encoding="utf-8")#, encoding="utf-8"
 
     # loops forever, so make sure to stop manually when the rank table ends
-    while True:
+    while player < 10000:
         # grab the specified area of the screen with mss
         img_rgb  = numpy.array(mss.mss().grab(monitor))
         img_rgb  = cv2.cvtColor(img_rgb, cv2.COLOR_RGBA2RGB)
@@ -201,21 +203,24 @@ def process_screen():
 
             # construct the data line that we will print to file as CSV
             data_line = str(player_number) + ", " + player_name + ", " + char_name + ", " + rank_name
-
+            playersJSON.append({"rank": player_number, "char": char_name, "rank": rank_name, "player_name:" player_name})
             # write out the data
+            #attempt to catch errors during printing non-UNICODE characters to windows terminal
             try:
                 print(data_line)
             except:
                 print("error Printing")
-                
-            f.write(data_line + "\n")
-            #time.sleep(2.0)
+
+            f1.write(data_line + "\n")
+
 
         # each screen advances 12 new players
         player = player + 12
 
     # close the file that we wrote to
-    f.close()
+    f2.write(unicode(json.dumps(playersJSON)))
+    f1.close()
+    f2.close()
     print("Finished")
 
 def main():
