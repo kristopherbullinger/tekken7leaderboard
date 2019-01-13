@@ -131,7 +131,7 @@ def process_screen():
     player = 0
 
     # open the file in utf-8 mode because the OCR produces weird results
-    f = io.open('tekken_rank_data_csv.txt', 'w', encoding="utf-8")
+    f = io.open('tekken_rank_data_csv.txt', 'w', encoding="utf-8")#, encoding="utf-8"
 
     # loops forever, so make sure to stop manually when the rank table ends
     while True:
@@ -170,22 +170,26 @@ def process_screen():
 
             # show the current screen capture with debug information
             # next line is just so the image display doesn't block code
-            cv2.imshow('Tekken', img_rgb)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+            # cv2.imshow('Tekken', img_rgb)
+            # if cv2.waitKey(1) & 0xFF == ord('q'):
+            #     break
 
             # extract cv2 images from the boxes we constructed
             name_image = img_gray[name_tl[1]:name_br[1], name_tl[0]:name_br[0]]
+            name_image = (255-name_image)
+            # cv2.imshow('Tekken', name_image)
+            # if cv2.waitKey(1) & 0xFF == ord('q'):
+            #     break
             char_image = img_rgb[char_tl[1]:char_br[1], char_tl[0]:char_br[0]]
             rank_image = img_rgb[rank_tl[1]:rank_br[1], rank_tl[0]:rank_br[0]]
 
             # match the character image, giving us the index into the image/name array
-            #process_char_image(char_image)
+            process_char_image(char_image)
             char_index = match_char_image(char_image)
             char_name = char_names[char_index]
 
             # match the rank image, giving us the index into the image/name array
-            #process_rank_image(rank_image)
+            process_rank_image(rank_image)
             rank_index = match_rank_image(rank_image)
             rank_name = rank_names[rank_index]
 
@@ -196,12 +200,16 @@ def process_screen():
             player_number = player + i + 1
 
             # construct the data line that we will print to file as CSV
-            data_line = str(player_number) + ", " + player_name #+ ", " + char_name + ", " + rank_name
+            data_line = str(player_number) + ", " + player_name + ", " + char_name + ", " + rank_name
 
             # write out the data
-            print(data_line)
+            try:
+                print(data_line)
+            except:
+                print("error Printing")
+                
             f.write(data_line + "\n")
-            time.sleep(2.0)
+            #time.sleep(2.0)
 
         # each screen advances 12 new players
         player = player + 12
