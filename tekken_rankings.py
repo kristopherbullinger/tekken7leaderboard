@@ -1,18 +1,21 @@
-import cv2, numpy, os, time, math, psutil, mss, pytesseract, glob
+import cv2, numpy, os, time, math, psutil, mss, pytesseract, glob, io
 from directkeys import PressKey, ReleaseKey, W, A, S, D
+
+
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"
 
 # IMPORTANT NOTE: The following values are all calculate for a 1440p monitor
 # I am assuming that you are playing 2560x1440 in borderless mode, not windowed
 # Playing windowed mode will mess up all these numbers as they assume fullscreen
 # If you are playing at 1080p or 4K, you need to manually edit these values
-
+"""
 # the location and dimensions of the ranking box (rb)
 # the 'ranking box' is the smallest rectangle enclosing all 12 rank rows
 # this can be approximate, but all other values will be relative to this
-rb_t = 370          # box starts this many pixels from the top  of game screen
-rb_l = 450          # box starts this many pixels from the left of game screen
-rb_w = 1670         # box is this many pixels wide
-rb_h = 848          # box is this many pixels high
+rb_t = 281          # box starts this many pixels from the top  of game screen
+rb_l = 339          # box starts this many pixels from the left of game screen
+rb_w = 1252         # box is this many pixels wide
+rb_h = 636          # box is this many pixels high
 rb_r = rb_l + rb_w
 rb_b = rb_t + rb_h
 
@@ -20,16 +23,43 @@ rb_b = rb_t + rb_h
 monitor = {"top": rb_t, "left": rb_l, "width": rb_w, "height": rb_h}
 
 # the height of each row in the rankings table (has to be exact to the pixel)
-box_h = 71
+box_h = 53
 
 # left and right x-values of the boxes for name, rank, and chararacter
 # all of these values are relative to the ranking box, not the game window
-name_l = 245            # name box starts this many pixles from the left of rb
-name_r = name_l + 350   # name box ends this many pixles from the left of rb
-rank_l = 1500           # rank box starts this many pixles from the left of rb
-rank_r = 1660           # name box ends this many pixles from the left of rb
-char_l = 1387           # char box starts this many pixles from the left of rb
-char_r = 1490           # char box ends this many pixles from the left of rb
+name_l = 230            # name box starts this many pixles from the left of rb
+name_r = name_l + 867   # name box ends this many pixles from the left of rb
+rank_l = 1117           # rank box starts this many pixles from the left of rb 1456
+rank_r = 1257           # name box ends this many pixles from the left of rb
+char_l = 1039           # char box starts this many pixles from the left of rb
+char_r = 1117           # char box ends this many pixles from the left of rb
+"""
+
+# the location and dimensions of the ranking box (rb)
+# the 'ranking box' is the smallest rectangle enclosing all 12 rank rows
+# this can be approximate, but all other values will be relative to this
+rb_t = int(float(370 * 0.75))          # box starts this many pixels from the top  of game screen
+rb_l = int(float(450  * 0.75))         # box starts this many pixels from the left of game screen
+rb_w = int(float(1670  * 0.75))        # box is this many pixels wide
+rb_h = int(float(848 * 0.75))        # box is this many pixels high
+rb_r = int(float(rb_l + rb_w))
+rb_b = int(float(rb_t + rb_h))
+
+# the area of the screen that you want to capture (the ranking box area only)
+monitor = {"top": rb_t, "left": rb_l, "width": rb_w, "height": rb_h}
+
+# the height of each row in the rankings table (has to be exact to the pixel)
+box_h = int(float((71 * 0.75)))
+
+# left and right x-values of the boxes for name, rank, and chararacter
+# all of these values are relative to the ranking box, not the game window
+name_l = int(float(245 * 0.75))            # name box starts this many pixles from the left of rb
+name_r = int(float(name_l + (350 * 0.75)))   # name box ends this many pixles from the left of rb
+rank_l = int(float(1500 * 0.75))           # rank box starts this many pixles from the left of rb
+rank_r = int(float(1660 * 0.75))           # name box ends this many pixles from the left of rb
+char_l = int(float(1387 * 0.75))           # char box starts this many pixles from the left of rb
+char_r = int(float(1490 * 0.75))           # char box ends this many pixles from the left of rb
+
 
 # check to see if the Tekken 7 process is running
 def check_process():
@@ -37,7 +67,7 @@ def check_process():
     for pid in psutil.pids():
         p = psutil.Process(pid)
         if any(p.name() in s for s in wow_process_names):
-            print("   ", p.name(), " found") 
+            print("   ", p.name(), " found")
             return True
     return False
 
@@ -101,7 +131,7 @@ def process_screen():
     player = 0
 
     # open the file in utf-8 mode because the OCR produces weird results
-    f = open('tekken_rank_data_csv.txt', 'a+', encoding="utf-8")
+    f = io.open('tekken_rank_data_csv.txt', 'w', encoding="utf-8")
 
     # loops forever, so make sure to stop manually when the rank table ends
     while True:
@@ -113,9 +143,9 @@ def process_screen():
         # after we've captured the image, press the D key to advance leaderboard
         # it will load while we spend a few seconds parsing this screen
         # the sleep is required for the game to advance a frame and detect key press
-        PressKey(D) 
+        PressKey(D)
         time.sleep(0.1)
-        ReleaseKey(D) 
+        ReleaseKey(D)
 
         # there are 12 rankings displayed per page, iterate through them
         for i in range(0, 12):
@@ -150,10 +180,12 @@ def process_screen():
             rank_image = img_rgb[rank_tl[1]:rank_br[1], rank_tl[0]:rank_br[0]]
 
             # match the character image, giving us the index into the image/name array
+            #process_char_image(char_image)
             char_index = match_char_image(char_image)
             char_name = char_names[char_index]
 
             # match the rank image, giving us the index into the image/name array
+            #process_rank_image(rank_image)
             rank_index = match_rank_image(rank_image)
             rank_name = rank_names[rank_index]
 
@@ -162,20 +194,22 @@ def process_screen():
 
             # calculate the correct player leaderboard standing
             player_number = player + i + 1
-            
+
             # construct the data line that we will print to file as CSV
-            data_line = str(player_number) + ", " + player_name + ", " + char_name + ", " + rank_name
+            data_line = str(player_number) + ", " + player_name #+ ", " + char_name + ", " + rank_name
 
             # write out the data
             print(data_line)
             f.write(data_line + "\n")
+            time.sleep(2.0)
 
         # each screen advances 12 new players
-        player = player + 12      
+        player = player + 12
 
     # close the file that we wrote to
     f.close()
-        
+    print("Finished")
+
 def main():
 
     # Checks to see if Tekken is running
@@ -184,8 +218,8 @@ def main():
     print('Checking for Tekken 7 window')
     if check_process():
         print("    Tekken is running")
-        print("    Waiting 3 seconds, so you can switch to Tekken Window")
-        time.sleep(3)
+        print("    Waiting 2 seconds, so you can switch to Tekken Window")
+        time.sleep(2)
     else:
         print("    Tekken is not running, exiting program")
         exit()
@@ -194,10 +228,6 @@ def main():
     load_rank_images()
     process_screen()
 
-if __name__ == "__main__":
-    main()
-
-
 
 """
 
@@ -205,6 +235,8 @@ Code for generating unique character / rank images
 Unused if you already have the images
 This works by checking all the images and seeing if we have found a 'new' one
 When a new one is found, it saves it out to the given filename
+
+"""
 
 def process_char_image(char_img):
     threshold = 30
@@ -236,4 +268,6 @@ def process_rank_image(rank_image):
         print('New character image found:', len(rank_images))
         cv2.imwrite('rank' + str(len(rank_images)) + '.png', rank_image)
 
-"""
+
+if __name__ == "__main__":
+    main()
