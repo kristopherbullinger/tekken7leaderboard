@@ -55,8 +55,8 @@ box_h = int(float((71 * 0.75)))
 # all of these values are relative to the ranking box, not the game window
 name_l = int(float(245 * 0.75))            # name box starts this many pixles from the left of rb
 name_r = int(float(name_l + (350 * 0.75)))   # name box ends this many pixles from the left of rb
-rank_l = int(float(1500 * 0.75))           # rank box starts this many pixles from the left of rb
-rank_r = int(float(1660 * 0.75))           # name box ends this many pixles from the left of rb
+rank_l = int(float(1500 * 0.75 + 30))           # rank box starts this many pixles from the left of rb
+rank_r = int(float(1660 * 0.75 - 30))           # name box ends this many pixles from the left of rb
 char_l = int(float(1387 * 0.75))           # char box starts this many pixles from the left of rb
 char_r = int(float(1490 * 0.75))           # char box ends this many pixles from the left of rb
 
@@ -133,7 +133,7 @@ def process_screen():
 
     # open the file in utf-8 mode because the OCR produces weird results
     f1 = io.open('tekken_rank_data_csv.txt', 'w', encoding="utf-8")#, encoding="utf-8"
-    f2 = io.open('tekken_rank_data_json.txt', 'w', encoding="utf-8")#, encoding="utf-8"
+    #f2 = io.open('tekken_rank_data_json.txt', 'w', encoding="utf-8")#, encoding="utf-8"
 
     # loops forever, so make sure to stop manually when the rank table ends
     while player < 10000:
@@ -186,12 +186,12 @@ def process_screen():
             rank_image = img_rgb[rank_tl[1]:rank_br[1], rank_tl[0]:rank_br[0]]
 
             # match the character image, giving us the index into the image/name array
-            process_char_image(char_image)
+            #process_char_image(char_image)
             char_index = match_char_image(char_image)
             char_name = char_names[char_index]
 
             # match the rank image, giving us the index into the image/name array
-            process_rank_image(rank_image)
+            #process_rank_image(rank_image)
             rank_index = match_rank_image(rank_image)
             rank_name = rank_names[rank_index]
 
@@ -202,10 +202,10 @@ def process_screen():
             player_number = player + i + 1
 
             # construct the data line that we will print to file as CSV
-            data_line = str(player_number) + ", " + player_name + ", " + char_name + ", " + rank_name
-            playersJSON.append({"rank": player_number, "char": char_name, "rank": rank_name, "player_name:" player_name})
+            data_line = str(player_number) + ", " + player_name.replace("\n","") + ", " + char_name + ", " + rank_name
+            #playersJSON.append({"rank": player_number, "char": char_name, "rank": rank_name, "player_name:" player_name})
             # write out the data
-            #attempt to catch errors during printing non-UNICODE characters to windows terminal
+            #catch errors during printing non-UNICODE characters to windows terminal
             try:
                 print(data_line)
             except:
@@ -218,7 +218,7 @@ def process_screen():
         player = player + 12
 
     # close the file that we wrote to
-    f2.write(unicode(json.dumps(playersJSON)))
+    #f2.write(unicode(json.dumps(playersJSON)))
     f1.close()
     f2.close()
     print("Finished")
