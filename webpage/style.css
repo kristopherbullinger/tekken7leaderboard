@@ -1,0 +1,54 @@
+#content {
+  margin-left: 15%;
+  width: 70%;
+  background-color: white;
+  height: 100%;
+}
+
+#leaderboard {
+  width: 100%;
+  height: 90%;
+  overflow-y: scroll;
+}
+
+th {
+  height: 2em;
+}
+
+body {
+  background-color: #68604d;
+}
+
+.rank {
+  width: 5%;
+}
+
+.player {
+  width: 30%;
+}
+
+.character {
+  width: 30%;
+}
+
+.ranktitle {
+  width: 35%;
+}
+
+.next {
+  cursor: pointer;
+}
+
+.next:hover {
+  text-decoration: underline;
+  color: red;
+}
+
+.previous {
+  cursor: pointer;
+}
+
+.previous:hover {
+  text-decoration: underline;
+  color: red;
+}

@@ -9994,6 +9994,3 @@ let data = `1, obk_nmkr, Yoshimitsu, Tekken_God_Prime
 9994, WinterFlower, Hwoarang, Suzaku
 9995, WoolHoo!, Law, Suzaku
 9996, Micshaz, Asuka, Suzaku`
-
-
-export default data
