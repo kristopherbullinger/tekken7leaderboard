@@ -13,26 +13,24 @@
 
 th {
   height: 2em;
+  text-align: center;
+}
+
+td.character {
+  text-align: center;
+}
+
+td.ranktitle {
+  text-align: center;
 }
 
 body {
   background-color: #68604d;
 }
 
-.rank {
-  width: 5%;
-}
-
-.player {
-  width: 30%;
-}
-
-.character {
-  width: 30%;
-}
-
-.ranktitle {
-  width: 35%;
+img {
+  margin: auto;
+  max-height: 5em;
 }
 
 .next {

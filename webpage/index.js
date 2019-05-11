@@ -1,94 +1,110 @@
-// import { csvToJSON, findCharacters, findRanks, getCharacterData, getRankData } from './js_tools.js'
-// import data from './tekken_rank_data_csv_160120190051.txt'
-
 //data declarations
-let leaderboards = csvToJSON(data)
-let characters = findCharacters(leaderboards)
-let ranks = findRanks(leaderboards)
-let characterRanks = getCharacterData(leaderboards, characters, ranks)
-let rankCharacters = getRankData(leaderboards, characters, ranks)
+let leaderboards = data;
+let characters = findCharacters(leaderboards);
+let ranks = findRanks(leaderboards);
+let characterRanks = getCharacterData(leaderboards, characters, ranks);
+let rankCharacters = getRankData(leaderboards, characters, ranks);
 
 
 //element selections
-let leaderboard = document.querySelector("#leaderboard")
-let nextButton = document.querySelector(".next")
-let previousButton = document.querySelector(".previous")
-let searchInput = document.querySelector("#search")
-let searchButton = document.querySelector("#searchSubmit")
+let leaderboard = document.querySelector("#leaderboard");
+let nextButton = document.querySelector(".next");
+let previousButton = document.querySelector(".previous");
+let searchInput = document.querySelector("#search");
+let searchButton = document.querySelector("#searchSubmit");
+let tbody = document.querySelector("tbody");
 
-let page = 0
-
+let page = 0;
 
 //functions
+const clearBoard = () => {
+  document.querySelector("tbody").remove();
+  tbody = document.createElement("tbody");
+  leaderboard.appendChild(tbody);
+}
+
 const renderCurrentPage = () => {
-  leaderboard.innerHTML = `<tr>
-            <th class="rank">Rank</th>
-            <th class="player">Player</th>
-            <th class="character">Character</th>
-            <th class="ranktitle">Rank Title</th>
-          </tr>`
-  leaderboards.slice(page * 200, page * 200 + 200).forEach(pl => {
-  leaderboard.innerHTML += `
-    <tr>
-      <td class="rank">${pl.rank_number}</td>
-      <td class="player">${pl.name}</td>
-      <td class="character"><img src="../chars/${pl.character}.png"></td>
-      <td class="ranktitle"><img src="../ranks/${pl.rank}.png"></td>
-    </tr>
-    `
-  })
+  let i = page * 100;
+  let end = i + 100;
+  clearBoard();
+  for (i; i < end; i++) {
+    renderRow(leaderboards[i]);
+  }
+}
+
+const renderRow = player => {
+  let tr = document.createElement("tr");
+  tbody.appendChild(tr);
+
+  let rankTd = document.createElement("td");
+  rankTd.classList.add("rank");
+  rankTd.appendChild(document.createTextNode(player.rank_number));
+  tr.appendChild(rankTd);
+
+  let playerTd = document.createElement("td");
+  playerTd.classList.add("player");
+  playerTd.appendChild(document.createTextNode(player.name));
+  tr.appendChild(playerTd);
+
+  let charTd = document.createElement("td");
+  let charImg = document.createElement("img");
+  charImg.src=`../chars/${player.character}.png`;
+  charTd.classList.add("character");
+  charTd.appendChild(charImg)
+  tr.appendChild(charTd);
+
+  let rankTitleTd = document.createElement("td");
+  let rankImg = document.createElement("img");
+  rankImg.src=`../ranks/${player.rank}.png`;
+  rankTitleTd.classList.add("ranktitle");
+  rankTitleTd.appendChild(rankImg);
+  tr.appendChild(rankTitleTd);
 }
 
 const renderSearch = results => {
-  leaderboard.innerHTML = `<tr>
-            <th class="rank">Rank</th>
-            <th class="player">Player</th>
-            <th class="character">Character</th>
-            <th class="ranktitle">Rank Title</th>
-          </tr>`
-  results.slice(0, 200).forEach(pl => {
-  leaderboard.innerHTML += `
-    <tr>
-      <td class="rank">${pl.rank_number}</td>
-      <td class="player">${pl.name}</td>
-      <td class="character"><img src="../chars/${pl.character}.png"></td>
-      <td class="ranktitle"><img src="../ranks/${pl.rank}.png"></td>
-    </tr>
-    `
-  })
+  clearBoard();
+  for (let i=0; i < 100; i++) {
+    renderRow(results[i]);
+  }
+}
+
+const loading = () => {
+  leaderboard.className += " blurry"
+  setTimeout(() => leaderboard.classList.remove("blurry"), 2000)
 }
 
 const nextPage = () => {
-  if ((page + 1) + 200 < leaderboards.length ) {page += 1
-  renderCurrentPage()}
+  if ((page + 1) + 100 < leaderboards.length ) {
+    // loading()
+    page += 1;
+    renderCurrentPage();
+  }
   else {null}
 }
 
 const prevPage = () => {
-  if (page > 0) {page -= 1
-    renderCurrentPage()}
+  if (page > 0) {
+    // loading()
+    page -= 1;
+    renderCurrentPage();
+  }
   else {null}
 }
 
 const search = term => {
-  term = term.toLowerCase()
-  results = leaderboards.filter(pl => pl.name.toLowerCase().includes(term) || pl.rank.toLowerCase().includes(term) || pl.character.toLowerCase().includes(term))
-  renderSearch(results)
+  term = term.toLowerCase();
+  results = leaderboards.filter(pl => pl.name.toLowerCase().includes(term) || pl.rank.toLowerCase().includes(term) || pl.character.toLowerCase().includes(term));
+  renderSearch(results);
 }
 
-nextButton.addEventListener("click", nextPage)
-previousButton.addEventListener("click", prevPage)
-searchSubmit.addEventListener("click", () => search(searchInput.value))
+nextButton.addEventListener("click", nextPage);
+previousButton.addEventListener("click", prevPage);
+searchSubmit.addEventListener("click", () => search(searchInput.value));
 document.addEventListener("keydown", (e) => {
-  console.log(e)
   if (e.target.id !== "search") {
     if (e.keyCode === 81) {prevPage()}
     if (e.keyCode === 87) {nextPage()}
   }
 })
 
-renderCurrentPage()
-
-
-//${pl.character.split("_").join(" ")}
-//${pl.rank.split("_").join(" ")}
+renderCurrentPage();

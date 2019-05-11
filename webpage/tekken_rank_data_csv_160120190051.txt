@@ -1,4 +1,4 @@
-let data = `1, obk_nmkr, Yoshimitsu, Tekken_God_Prime
+1, obk_nmkr, Yoshimitsu, Tekken_God_Prime
 2, , Kazuya, Tekken_God_Prime
 3, nomjang, Jin, Tekken_God_Prime
 4, Sersambo, Dragunov, Tekken_God_Prime
@@ -9993,4 +9993,4 @@ let data = `1, obk_nmkr, Yoshimitsu, Tekken_God_Prime
 9993, Shinee, Bryan, Suzaku
 9994, WinterFlower, Hwoarang, Suzaku
 9995, WoolHoo!, Law, Suzaku
-9996, Micshaz, Asuka, Suzaku`
+9996, Micshaz, Asuka, Suzaku

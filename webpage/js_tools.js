@@ -29,7 +29,7 @@ const getCharacterData = (players, characterList, rankList) => {
       characterData[ch][rank] = players.filter(pl => pl.rank === rank && pl.character === ch).length
     })
   })
-  return characterData
+  return characterData;
 }
 
 const getRankData = (players, characterList, rankList) => {
